@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smash Ultimate Notebook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="Smash Ultimate Notebook home"><span class="brand-mark">S</span><span>Smash <b>Notebook</b></span></a>
+      <div class="topbar-actions">
+        <button class="icon-button" id="exportButton" title="Export your data" aria-label="Export your data">⇩</button>
+        <label class="icon-button" title="Import your data" aria-label="Import your data">⇧<input id="importInput" type="file" accept="application/json" hidden /></label>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">YOUR PERSONAL MATCHUP LAB</p>
+          <h1>Learn the set.<br /><em>Own the matchup.</em></h1>
+          <p class="hero-copy">Track every game, find the patterns, and build your personal Smash Ultimate matchup chart — one set at a time.</p>
+        </div>
+        <div class="hero-art" aria-hidden="true"><span>⚡</span><i></i><b></b></div>
+      </section>
+
+      <section class="setup-card" id="setupCard">
+        <div class="step-number">01</div>
+        <div class="setup-content">
+          <p class="eyebrow">START YOUR NOTEBOOK</p>
+          <h2>Who do you play?</h2>
+          <p>Choose your main to create a dedicated matchup chart.</p>
+          <div class="character-picker">
+            <label for="playerCharacter">Your character</label>
+            <select id="playerCharacter"><option value="">Choose a fighter</option></select>
+            <button class="primary-button" id="startButton" disabled>Start tracking <span>→</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section class="dashboard hidden" id="dashboard">
+        <div class="dashboard-head">
+          <div>
+            <p class="eyebrow">MATCHUP NOTEBOOK</p>
+            <h2><span id="mainName"></span> <span class="muted">vs. everyone</span></h2>
+          </div>
+          <button class="text-button" id="changeMainButton">Change main</button>
+        </div>
+
+        <div class="stats-grid">
+          <article><span class="stat-label">TOTAL GAMES</span><strong id="totalGames">0</strong><small>logged in this notebook</small></article>
+          <article><span class="stat-label">WIN RATE</span><strong id="winRate">—</strong><small id="recordText">No games yet</small></article>
+          <article><span class="stat-label">BEST MATCHUP</span><strong class="small-stat" id="bestMatchup">—</strong><small id="bestMatchupDetail">Play some games</small></article>
+        </div>
+
+        <div class="workspace">
+          <section class="log-card">
+            <div class="section-heading"><div><p class="eyebrow">GAME LOG</p><h3>Record a match</h3></div><span class="live-dot">READY</span></div>
+            <form id="matchForm">
+              <label for="opponentCharacter">Who did you play against?</label>
+              <select id="opponentCharacter" required><option value="">Choose opponent</option></select>
+              <label>Result</label>
+              <div class="result-toggle" role="group" aria-label="Match result">
+                <button type="button" data-result="win" class="result-option active">WIN</button>
+                <button type="button" data-result="loss" class="result-option">LOSS</button>
+              </div>
+              <label for="matchNotes">Notes <span>(optional)</span></label>
+              <textarea id="matchNotes" rows="3" placeholder="What did you learn? Any key habits?"></textarea>
+              <button class="primary-button full" type="submit">Log match <span>＋</span></button>
+            </form>
+          </section>
+
+          <section class="chart-card">
+            <div class="section-heading chart-heading"><div><p class="eyebrow">YOUR MATCHUP CHART</p><h3>Built from your results</h3></div><div class="legend"><span class="minus">−</span> losing <span class="zero">0</span> even <span class="plus">+</span> winning</div></div>
+            <div class="tier-guide"><span class="tier negative">−2</span><span class="tier negative">−1</span><span class="tier neutral">0</span><span class="tier positive">+1</span><span class="tier positive">+2</span></div>
+            <div class="matchup-chart" id="matchupChart"></div>
+          </section>
+        </div>
+
+        <section class="history-card">
+          <div class="section-heading"><div><p class="eyebrow">RECENT ACTIVITY</p><h3>Match history</h3></div><button class="text-button danger" id="clearButton">Clear all data</button></div>
+          <div id="historyList" class="history-list"><div class="empty-state">Your logged matches will show up here.</div></div>
+        </section>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="script.js"></script>
+</body>
+</html>
