@@ -49,8 +49,13 @@ $("startButton").addEventListener("click", () => { data.main=$("playerCharacter"
 document.querySelectorAll(".result-option").forEach(btn => btn.addEventListener("click", () => { selectedResult=btn.dataset.result; document.querySelectorAll(".result-option").forEach(b=>b.classList.toggle("active",b===btn)); }));
 $("matchForm").addEventListener("submit", e => { e.preventDefault(); const opponent=$("opponentCharacter").value; if(!opponent) return; data.matches.push({id:Date.now(),opponent,result:selectedResult,notes:$("matchNotes").value.trim(),date:new Date().toISOString()}); save(); e.target.reset(); selectedResult="win"; document.querySelectorAll(".result-option").forEach(b=>b.classList.toggle("active",b.dataset.result==="win")); render(); toast("Match logged."); });
 $("historyList").addEventListener("click", e => { const id=e.target.dataset.id; if(!id) return; data.matches=data.matches.filter(m=>m.id!==Number(id)); save(); render(); toast("Match removed."); });
-$("changeMainButton").addEventListener("click", () => { if(confirm("Changing your main will start a fresh notebook. Continue?")){ data={main:"",matches:[]}; save(); fillSelect($("playerCharacter")); render(); } });
+$("changeMainButton").addEventListener("click", () => { if(confirm("Changing your main will start a fresh notebook. Continue?\n\nRemember to click 'Upload Notebook' to save this notebook!")){ data={main:"",matches:[]}; save(); fillSelect($("playerCharacter")); render(); } });
 $("clearButton").addEventListener("click", () => { if(confirm("Delete every logged match? This cannot be undone.")){ data.matches=[]; save(); render(); toast("Match history cleared."); } });
 $("exportButton").addEventListener("click", () => { const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}), url=URL.createObjectURL(blob), a=document.createElement("a"); a.href=url; a.download="smash-notebook-backup.json"; a.click(); URL.revokeObjectURL(url); toast("Notebook backup downloaded."); });
 $("importInput").addEventListener("change", e => { const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{try{const incoming=JSON.parse(reader.result);if(!incoming.main||!Array.isArray(incoming.matches))throw Error();data=incoming;save();fillSelect($("playerCharacter"));render();toast("Notebook imported.");}catch{toast("That file isn't a valid notebook backup.");}};reader.readAsText(file); e.target.value=""; });
+window.addEventListener("beforeunload", event => {
+  if (!data.main) return;
+  event.preventDefault();
+  event.returnValue = "";
+});
 render();
