@@ -14,8 +14,8 @@
     <header class="topbar">
       <a class="brand" href="#top" aria-label="Smash Ultimate Notebook home"><span class="brand-mark">S</span><span>Smash <b>Notebook</b></span></a>
       <div class="topbar-actions">
-        <button class="icon-button" id="exportButton" title="Export your data" aria-label="Export your data">⇩</button>
-        <label class="icon-button" title="Import your data" aria-label="Import your data">⇧<input id="importInput" type="file" accept="application/json" hidden /></label>
+        <label class="data-button" title="Upload a saved notebook">⇧ <span>Upload Notebook</span><input id="importInput" type="file" accept="application/json" hidden /></label>
+        <button class="data-button" id="exportButton" title="Download your notebook" aria-label="Download your notebook">⇩ <span>Download Notebook</span></button>
       </div>
     </header>
 
@@ -40,6 +40,7 @@
             <select id="playerCharacter"><option value="">Choose a fighter</option></select>
             <button class="primary-button" id="startButton" disabled>Start tracking <span>→</span></button>
           </div>
+          <p class="continue-note">Already saved a notebook? <strong>Click 'Upload Notebook' to continue your notebook!</strong></p>
         </div>
       </section>
 
