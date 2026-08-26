@@ -5,7 +5,8 @@ let selectedResult = "win";
 const $ = (id) => document.getElementById(id);
 
 function fillSelect(select, includeMain = true) {
-  select.innerHTML = '<option value="">Choose a fighter</option>' + fighters.filter(f => includeMain || f !== data.main).map(f => `<option value="${f}">${f}</option>`).join("");
+  const alphabeticalFighters = fighters.filter(f => includeMain || f !== data.main).sort((a, b) => a.localeCompare(b));
+  select.innerHTML = '<option value="">Choose a fighter</option>' + alphabeticalFighters.map(f => `<option value="${f}">${f}</option>`).join("");
 }
 function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
 function tierFor(matches) {
