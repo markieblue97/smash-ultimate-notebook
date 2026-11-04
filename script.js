@@ -8,6 +8,21 @@ function fillSelect(select, includeMain = true) {
   const alphabeticalFighters = fighters.filter(f => includeMain || f !== data.main).sort((a, b) => a.localeCompare(b));
   select.innerHTML = '<option value="">Choose a fighter</option>' + alphabeticalFighters.map(f => `<option value="${f}">${f}</option>`).join("");
 }
+function isValidDate(dateString) {
+  if (typeof dateString !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(dateString)) return false;
+  const date = new Date(dateString);
+  return !Number.isNaN(date.getTime()) && date.toISOString() === dateString;
+}
+function isValidNotebook(notebook) {
+  if (!notebook || typeof notebook !== "object" || !fighters.includes(notebook.main) || !Array.isArray(notebook.matches)) return false;
+  return notebook.matches.every(match => match && typeof match === "object"
+    && Number.isSafeInteger(match.id)
+    && fighters.includes(match.opponent)
+    && match.opponent !== notebook.main
+    && (match.result === "win" || match.result === "loss")
+    && isValidDate(match.date)
+    && (match.notes === undefined || typeof match.notes === "string"));
+}
 function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
 function tierFor(matches) {
   if (!matches.length) return 0;
@@ -53,7 +68,7 @@ $("historyList").addEventListener("click", e => { const id=e.target.dataset.id; 
 $("changeMainButton").addEventListener("click", () => { if(confirm("Changing your main will start a fresh notebook. Continue?\n\nRemember to click 'Upload Notebook' to save this notebook!")){ data={main:"",matches:[]}; save(); fillSelect($("playerCharacter")); render(); } });
 $("clearButton").addEventListener("click", () => { if(confirm("Delete every logged match? This cannot be undone.")){ data.matches=[]; save(); render(); toast("Match history cleared."); } });
 $("exportButton").addEventListener("click", () => { const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}), url=URL.createObjectURL(blob), a=document.createElement("a"); const mainFilename = (data.main || "Smash_Ultimate").replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, ""); a.href=url; a.download=`${mainFilename}_Notebook.json`; a.click(); URL.revokeObjectURL(url); toast("Notebook backup downloaded."); });
-$("importInput").addEventListener("change", e => { const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{try{const incoming=JSON.parse(reader.result);if(!incoming.main||!Array.isArray(incoming.matches))throw Error();data=incoming;save();fillSelect($("playerCharacter"));render();toast("Notebook imported.");}catch{toast("That file isn't a valid notebook backup.");}};reader.readAsText(file); e.target.value=""; });
+$("importInput").addEventListener("change", e => { const file=e.target.files[0]; if(!file)return; const reader=new FileReader(); reader.onload=()=>{try{const incoming=JSON.parse(reader.result);if(!isValidNotebook(incoming))throw Error();data=incoming;save();fillSelect($("playerCharacter"));render();toast("Notebook imported.");}catch{toast("Upload rejected: the notebook data is invalid.");}};reader.readAsText(file); e.target.value=""; });
 window.addEventListener("beforeunload", event => {
   if (!data.main) return;
   event.preventDefault();
