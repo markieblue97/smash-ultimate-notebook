@@ -13,6 +13,11 @@ function isValidDate(dateString) {
   const date = new Date(dateString);
   return !Number.isNaN(date.getTime()) && date.toISOString() === dateString;
 }
+function isSafeNote(note) {
+  return typeof note === "string"
+    && note.length <= 1000
+    && !/[<>\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(note);
+}
 function isValidNotebook(notebook) {
   if (!notebook || typeof notebook !== "object" || !fighters.includes(notebook.main) || !Array.isArray(notebook.matches)) return false;
   return notebook.matches.every(match => match && typeof match === "object"
@@ -21,7 +26,7 @@ function isValidNotebook(notebook) {
     && match.opponent !== notebook.main
     && (match.result === "win" || match.result === "loss")
     && isValidDate(match.date)
-    && (match.notes === undefined || typeof match.notes === "string"));
+    && (match.notes === undefined || isSafeNote(match.notes)));
 }
 function save() { localStorage.setItem(KEY, JSON.stringify(data)); }
 function tierFor(matches) {
@@ -63,7 +68,7 @@ fillSelect($("playerCharacter"));
 $("playerCharacter").addEventListener("change", e => $("startButton").disabled = !e.target.value);
 $("startButton").addEventListener("click", () => { data.main=$("playerCharacter").value; data.matches=[]; save(); render(); toast(`${data.main} notebook started!`); });
 document.querySelectorAll(".result-option").forEach(btn => btn.addEventListener("click", () => { selectedResult=btn.dataset.result; document.querySelectorAll(".result-option").forEach(b=>b.classList.toggle("active",b===btn)); }));
-$("matchForm").addEventListener("submit", e => { e.preventDefault(); const opponent=$("opponentCharacter").value; if(!opponent) return; data.matches.push({id:Date.now(),opponent,result:selectedResult,notes:$("matchNotes").value.trim(),date:new Date().toISOString()}); save(); e.target.reset(); selectedResult="win"; document.querySelectorAll(".result-option").forEach(b=>b.classList.toggle("active",b.dataset.result==="win")); render(); toast("Match logged."); });
+$("matchForm").addEventListener("submit", e => { e.preventDefault(); const opponent=$("opponentCharacter").value, notes=$("matchNotes").value.trim(); if(!opponent) return; if(!isSafeNote(notes)){ toast("Notes may only contain plain text."); return; } data.matches.push({id:Date.now(),opponent,result:selectedResult,notes,date:new Date().toISOString()}); save(); e.target.reset(); selectedResult="win"; document.querySelectorAll(".result-option").forEach(b=>b.classList.toggle("active",b.dataset.result==="win")); render(); toast("Match logged."); });
 $("historyList").addEventListener("click", e => { const id=e.target.dataset.id; if(!id) return; data.matches=data.matches.filter(m=>m.id!==Number(id)); save(); render(); toast("Match removed."); });
 $("changeMainButton").addEventListener("click", () => { if(confirm("Changing your main will start a fresh notebook. Continue?\n\nRemember to click 'Upload Notebook' to save this notebook!")){ data={main:"",matches:[]}; save(); fillSelect($("playerCharacter")); render(); } });
 $("clearButton").addEventListener("click", () => { if(confirm("Delete every logged match? This cannot be undone.")){ data.matches=[]; save(); render(); toast("Match history cleared."); } });
